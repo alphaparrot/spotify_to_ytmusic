@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "spotify2ytmusic"
-version = "0.1.0"
+version = "0.10.2"
 description = "Copy Spotify playlists to YTMusic/YouTube Music"
 authors = ["Sean Reifschneider <jafo00@gmail.com>"]
 license = "Creative Commons Zero v1.0 Universal"
@@ -29,7 +29,7 @@ s2yt_ytoauth = "spotify2ytmusic.cli:ytoauth"
 [tool.briefcase]
 project_name = "Spotify2YTMusic"
 bundle = "com.linsomniac"
-version = "0.1"
+version = "0.10"
 
 [tool.briefcase.app.spotify2ytmusic]
 formal_name = "Spotify2YTMusic"
