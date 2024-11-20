@@ -124,6 +124,47 @@ class SpotifyAPI:
         def __init__(self, access_token):
             self.access_token = access_token
 
+def fetch_playlist(playlist_id, token="", file='playlists.json', format='json'):
+
+    # Log into the Spotify API.
+    if token != "":
+        spotify = SpotifyAPI(token)
+    else:
+        spotify = SpotifyAPI.authorize(
+            client_id="5c098bcc800e45d49e476265bc9b6934",
+            scope="playlist-read-private playlist-read-collaborative user-library-read",
+        )
+
+    playlist = spotify.list("playlists/{playlist_id}/tracks".format(playlist_id=playlist_id),{"limit":100})
+
+    # Write the file.
+    print("Writing files...")
+    with open(file, "w", encoding="utf-8") as f:
+        # JSON file.
+        if format == "json":
+            json.dump({"playlists": [playlist,], "albums": []}, f)
+
+        # Tab-separated file.
+        else:
+            f.write("Playlists: \r\n\r\n")
+            f.write(playlist["name"] + "\r\n")
+            for track in playlist["tracks"]:
+                if track["track"] is None:
+                    continue
+                f.write(
+                    "{name}\t{artists}\t{album}\t{uri}\t{release_date}\r\n".format(
+                        uri=track["track"]["uri"],
+                        name=track["track"]["name"],
+                        artists=", ".join(
+                            [artist["name"] for artist in track["track"]["artists"]]
+                        ),
+                        album=track["track"]["album"]["name"],
+                        release_date=track["track"]["album"]["release_date"],
+                    )
+                )
+            f.write("\r\n")
+
+    print("Wrote file: " + file)
 
 def main(dump="playlists,liked", format="json", file="playlists.json", token=""):
     print("Starting backup...")
