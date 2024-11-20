@@ -273,6 +273,71 @@ def copy_playlist():
         privacy_status=args.privacy,
     )
 
+def copy_playlist_from_url():
+    """
+    Copy a Spotify playlist to a YTMusic playlist
+    """
+
+    def parse_arguments():
+        parser = ArgumentParser()
+        parser.add_argument(
+            "--track-sleep",
+            type=float,
+            default=0.1,
+            help="Time to sleep between each track that is added (default: 0.1)",
+        )
+        parser.add_argument(
+            "--dry-run",
+            action="store_true",
+            help="Do not add songs to destination playlist (default: False)",
+        )
+        parser.add_argument(
+            "spotify_playlist_url",
+            type=str,
+            help="URL of the Spotify playlist to copy from",
+        )
+        parser.add_argument(
+            "ytmusic_playlist_url",
+            type=str,
+            help="URL of the playlist to copy to",
+        )
+        parser.add_argument(
+            "--spotify-playlists-encoding",
+            default="utf-8",
+            help="The encoding of the `playlists.json` file.",
+        )
+        parser.add_argument(
+            "--algo",
+            type=int,
+            default=0,
+            help="Algorithm to use for search (0 = exact, 1 = extended, 2 = approximate)",
+        )
+        parser.add_argument(
+            "--no-reverse-playlist",
+            action="store_true",
+            help="Do not reverse playlist on load, regular playlists are reversed normally "
+            "so they end up in the same order as on Spotify.",
+        )
+        parser.add_argument(
+            "--privacy",
+            default="PRIVATE",
+            help="The privacy seting of created playlists (PRIVATE, PUBLIC, UNLISTED, default PRIVATE)",
+        )
+
+        return parser.parse_args()
+
+    args = parse_arguments()
+    playlist_id = args.spotify_playlist_url.split("/")[-1]
+    ytplaylist_id = args.ytmusic_playlist_url.split("list=")[1]
+    backend.copy_playlist_from_web(
+        spotify_playlist_id=playlist_id,
+        ytmusic_playlist_id=ytplaylist_id,
+        track_sleep=args.track_sleep,
+        dry_run=args.dry_run,
+        spotify_playlists_encoding=args.spotify_playlists_encoding,
+        reverse_playlist=not args.no_reverse_playlist,
+        privacy_status=args.privacy,
+    )
 
 def copy_all_playlists():
     """
@@ -336,11 +401,11 @@ def gui():
     gui.main()
 
 
-def ytoauth():
+def ytheaders():
     """
-    Run the "ytmusicapi oauth" login.
+    Run the "ytmusicapi browser" login.
     """
     from ytmusicapi.setup import main
 
-    sys.argv = ["ytmusicapi", "oauth"]
+    sys.argv = ["ytmusicapi", "browser"]
     sys.exit(main())
